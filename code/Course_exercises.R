@@ -1,3 +1,4 @@
+install.packages("tidyverse")
 library(tidyverse)
 
 
@@ -9,7 +10,7 @@ source("code/packages_and_functions.R")
 
 
 
-# working dir and session info --------------------------------------------
+# working dir and session info - supply with paper --------------------------------------------
 
 #print the working directory
 getwd()
@@ -49,14 +50,15 @@ iris %>%
   theme_minimal()
 
 
-# faceting ----------------------------------------------------------------
+# faceting - for loading different plots into one plot ----------------------------------------------------------------
 iris %>%  
   ggplot(aes(x = Sepal.Length, y = Sepal.Width, color = Species)) +
   geom_point() +
   theme_minimal() +
   facet_wrap(vars(Species))
 
-#try the Esquisse 'ggplot2 builder' add-on
+#try the Esquisse 'ggplot2 builder' add-on (find under Addins in the line above)
+install.packages("esquisse")
 library(esquisse)
 help("esquisse")
 
@@ -74,7 +76,7 @@ iris %>%
   theme(legend.position = "left")
 
 #saving a plot
-ggsave("pictures/iris_test.png", bg = "white")
+ggsave("pictures/iris_test.png", bg = "white", units = "")
 
 
 # Tibbles - tidy your data ------------------------------------------------
@@ -133,6 +135,7 @@ Syn_tb
 Syn_tb %>%
   ggplot(aes(x = Time, y = fluorescence, color = condition)) +
   geom_smooth() +
+  geom_line() +
   theme_minimal()
 
 ggsave("pictures/synuclein_data.png", bg = "white")
@@ -158,6 +161,55 @@ Ca %>%
 
 ggsave("pictures/Kei_NOS_data.png", bg = "white")
 
+
+# Exercises ---------------------------------------------------------------
+#Exercises - example-Kei data (facet by cell and genotype, change colour of lines, change font size of x axis, make x-axis label bold, make a boxplot)
+Ca %>% 
+  ggplot(aes(x = frame, y = intensity, color = genotype, 
+             group = genotype)) +
+  geom_smooth(aes(group=genotype), level = 0.99, size = 0.5, span = 0.1, method = "loess") +
+  theme(axis.text.x = element_text(size=10), axis.title = element_text(face="bold")) +
+  scale_color_manual(values = Okabe_Ito) +
+  geom_line(aes(group = sample), size =  0.5, alpha = 0.1) +
+  facet_wrap(vars(cell, genotype))
+ggsave("pictures/Kei_NOS_data_trial5.png", bg = "white")
+
+Ca %>% 
+  ggplot(aes(x = frame, y = intensity, color = genotype, 
+             group = genotype)) +
+  geom_boxplot(aes(group=genotype), level = 0.99, size = 0.5, span = 0.1, method = "loess") +
+  theme(axis.text.x = element_text(size=10), axis.title = element_text(face="bold")) +
+  scale_color_manual(values = Okabe_Ito) +
+  geom_line(aes(group = sample), size =  0.5, alpha = 0.1) +
+  facet_wrap(vars(cell, genotype))
+ggsave("pictures/Kei_NOS_data_trial6.png", bg = "white")
+
+#Exercise Barnali (add lines to smooth curves, facet for condition, log2 for x-axis)
+Syn_tb %>%
+  ggplot(aes(x = Time, y = fluorescence, color = condition)) +
+  geom_smooth() +
+  geom_line(aes(group=sample), size = 0.5, alpha = 0.1) +
+  theme_minimal()
+
+ggsave("pictures/synuclein_data_trial3.png", bg = "white")
+
+Syn_tb %>%
+  ggplot(aes(x = Time, y = fluorescence, color = condition)) +
+  geom_smooth() +
+  geom_line(aes(group=sample), size = 0.5, alpha = 0.1) +
+  theme_minimal() +
+  facet_wrap(vars(condition))
+
+ggsave("pictures/synuclein_data_trial4.png", bg = "white")
+
+Syn_tb %>%
+  ggplot(aes(x = Time, y = fluorescence, color = condition)) +
+  geom_smooth() +
+  geom_line(aes(group=sample), size = 0.5, alpha = 0.1) +
+  scale_x_continuous(trans='log2') +
+  theme_minimal()
+
+ggsave("pictures/synuclein_data_trial3.png", bg = "white")
 
 # Example data from Tom ---------------------------------------------------
 
@@ -194,7 +246,7 @@ ggsave("pictures/Tom_filo_data.png", bg = "white")
 
 
 # Assemble multi-panel figures with cowplot and patchwork -----------------
-
+# control+shift+r for list
 ### read the images with readPNG from pictures/ folder
   
 img1 <- readPNG("pictures/Platynereis_SEM_inverted_nolabel.png")
@@ -208,13 +260,15 @@ img5 <- readPNG("pictures/MC3cover-200um.png")
 panelA <- cowplot::ggdraw() + cowplot::draw_image(img1, scale = 1) + 
   draw_label("Platynereis larva", x = 0.35, y = 0.99, fontfamily = "sans", fontface = "plain",
              color = "black", size = 11, angle = 0, lineheight = 0.9, alpha = 1) +
-  draw_label(expression(paste("50 ", mu, "m")), x = 0.27, y = 0.05, fontfamily = "sans", fontface = "plain",
+  draw_label(expression(paste("50 ", mu, "m")), x = 0.60, y = 0.05, fontfamily = "sans", fontface = "plain",
              color = "black", size = 10, angle = 0, lineheight = 0.9, alpha = 1) + 
   draw_label("head", x = 0.5, y = 0.85, fontfamily = "sans", fontface = "plain",
              color = "black", size = 9, angle = 0, lineheight = 0.9, alpha = 1) + 
   draw_label("sg0", x = 0.52, y = 0.67, fontfamily = "sans", fontface = "plain",
              color = "black", size = 9, angle = 0, lineheight = 0.9, alpha = 1)
 panelA
+
+install.packages("magick")
 #Make panels B-D
 panelB <- ggdraw() + draw_image(img2)
 panelC <- ggdraw() + draw_image(img3)
@@ -227,7 +281,9 @@ panelD
 # Adding scale bars -------------------------------------------------------
 
 panelE <- ggdraw() + draw_image(img5, scale = 1) + 
-  draw_line(x = c(0.1, 0.3), y = c(0.07, 0.07), color = "black", size = 0.5)
+  draw_line(x = c(0.1, 0.3), y = c(0.07, 0.07), color = "black", size = 0.5) +
+  draw_label("40µm", x = 0.2, y = 0.08, fontfamily = "sans", fontface = "plain",
+             color = "black", size = 9, angle = 0, lineheight = 0.9, alpha = 1)
 panelE
 
 
@@ -264,3 +320,38 @@ Figure1 <- panelA + panelB + panelC + panelD + panelE +
 
 ggsave("figures/Figure1_layout2.png", limitsize = FALSE, 
        units = c("px"), Figure1, width = 3200, height = 1600, bg = "white")
+
+#exercise rearrange panel
+panelB <- cowplot::ggdraw() + cowplot::draw_image(img1, scale = 1) + 
+  draw_label("Platynereis larva", x = 0.30, y = 0.99, fontfamily = "sans", fontface = "plain",
+             color = "black", size = 11, angle = 0, lineheight = 0.9, alpha = 1) +
+  draw_label(expression(paste("50 ", mu, "m")), x = 0.30, y = 0.05, fontfamily = "sans", fontface = "plain",
+             color = "black", size = 10, angle = 0, lineheight = 0.9, alpha = 1) + 
+  draw_label("head", x = 0.5, y = 0.85, fontfamily = "sans", fontface = "plain",
+             color = "black", size = 9, angle = 0, lineheight = 0.9, alpha = 1) + 
+  draw_label("sg0", x = 0.52, y = 0.67, fontfamily = "sans", fontface = "plain",
+             color = "black", size = 9, angle = 0, lineheight = 0.9, alpha = 1)
+panelB
+
+panelA <- ggdraw() + draw_image(img2, scale = 1)
+panelC <- ggdraw() + draw_image(img3)
+panelD <- ggdraw() + draw_image(img4)
+panelA
+panelC
+panelD
+
+panelE <- ggdraw() + draw_image(img5, scale = 1) + 
+  draw_line(x = c(0.1, 0.3), y = c(0.07, 0.07), color = "black", size = 0.5) +
+  draw_label("40µm", x = 0.15, y = 0.075, fontfamily = "sans", fontface = "plain",
+             color = "black", size = 9, angle = 0, lineheight = 0.9, alpha = 1)
+panelE
+
+layout <- 
+  "ABBC
+   DBBE"
+Figure1 <- panelA + panelB + panelC + panelD + panelE +
+  patchwork::plot_layout(design = layout, width = c(1, 0.5, 1, 1, 0.5, 1), heights = c(2, 1)) +
+  patchwork::plot_annotation(tag_levels = "I") &
+  ggplot2::theme(plot.tag = element_text(size = 14, face='bold'))
+ggsave("figures/Figure1_layout6.png", limitsize = FALSE, 
+       units = c("px"), Figure1, width = 3000, height = 1000, bg = "white")
