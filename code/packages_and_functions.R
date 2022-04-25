@@ -6,6 +6,7 @@ library(tidyverse)
 library(cowplot)
 library(png)
 library(patchwork)
+library(magick)
 
 
 #define some colors

@@ -2,8 +2,8 @@ $citation
 
 To cite RStudio in publications use:
 
-  RStudio Team (2021). RStudio: Integrated Development Environment for
-  R. RStudio, PBC, Boston, MA URL http://www.rstudio.com/.
+  RStudio Team (2022). RStudio: Integrated Development Environment for R.
+  RStudio, PBC, Boston, MA URL http://www.rstudio.com/.
 
 A BibTeX entry for LaTeX users is
 
@@ -12,7 +12,7 @@ A BibTeX entry for LaTeX users is
     author = {{RStudio Team}},
     organization = {RStudio, PBC},
     address = {Boston, MA},
-    year = {2021},
+    year = {2022},
     url = {http://www.rstudio.com/},
   }
 
@@ -21,8 +21,11 @@ $mode
 [1] "desktop"
 
 $version
-[1] '1.4.1717'
+[1] ‘2022.2.0.443’
+
+$long_version
+[1] "2022.02.0+443"
 
 $release_name
-[1] "Juliet Rose"
+[1] "Prairie Trillium"
 

@@ -8,7 +8,6 @@ library(tidyverse)
 source("code/packages_and_functions.R")
 
 
-
 # working dir and session info --------------------------------------------
 
 #print the working directory
@@ -31,7 +30,7 @@ iris %>%  #we use a pipe to input the data to ggplot
   ggplot(aes(x = Sepal.Length, y = Sepal.Width, color = Species)) +  #we use + to add different elements of the plot
   geom_point() +
   geom_smooth() +
-  theme_minimal()
+  theme_classic()
 
 #another plot
 ggplot(data=diamonds, mapping=aes(x = carat, y = price, color = cut))+
@@ -46,14 +45,14 @@ ggplot(data=diamonds) +
 iris %>%  
   ggplot(aes(x = Sepal.Length, y = Sepal.Width, color = Species)) +
   geom_boxplot(notch = TRUE) +
-  theme_minimal()
+  theme_classic()
 
 
 # faceting ----------------------------------------------------------------
 iris %>%  
   ggplot(aes(x = Sepal.Length, y = Sepal.Width, color = Species)) +
   geom_point() +
-  theme_minimal() +
+  theme_classic() +
   facet_wrap(vars(Species))
 
 #try the Esquisse 'ggplot2 builder' add-on
@@ -67,18 +66,19 @@ help("esquisse")
 iris %>%  
   ggplot(aes(x = Sepal.Length, y = Sepal.Width, color = Species)) +
   geom_point() +
-  theme_minimal() +
+  geom_smooth() +
+  theme_classic() +
   facet_wrap(vars(Species)) +
-  labs(x = "x axis label", y = "y axis label") +
-  theme_minimal() +
+  labs(x = "Sepal Length", y = "Sepal width") +
+  theme_classic() +
   theme(legend.position = "left")
 
 #saving a plot
-ggsave("pictures/iris_test.png", bg = "white")
+ggsave("pictures/iris_test.png", bg = "white") # can remove background (bg) to have it transparent
 
 
 # Tibbles - tidy your data ------------------------------------------------
-
+%>% 
 vignette("tibble")
 
 #A simple tibble
@@ -133,7 +133,9 @@ Syn_tb
 Syn_tb %>%
   ggplot(aes(x = Time, y = fluorescence, color = condition)) +
   geom_smooth() +
-  theme_minimal()
+  geom_point(aes(group=sample), alpha=0.2, size=0.5, pch=16) +
+  facet_wrap(vars(condition)) +
+  theme_classic() + theme(legend.position = "top")
 
 ggsave("pictures/synuclein_data.png", bg = "white")
 
@@ -149,12 +151,15 @@ Ca
 
 #Example data from Kei
 Ca %>% 
-  ggplot(aes(x = frame, y = intensity, color = genotype, 
-             group = genotype)) +
-  geom_smooth(level = 0.99, size = 0.5, span = 0.1, method = "loess") +
-  geom_line(aes(group = sample), size =  0.5, alpha = 0.1) +
-  theme_classic() +
-  facet_wrap(vars(cell))
+  ggplot(aes(x = frame, y = intensity, color = genotype, group = genotype)) +
+# geom_smooth(level = 0.99, size = 0.5, span = 0.1, method = "loess") +
+ # geom_line(aes(group = sample), size =  0.5, alpha = 0.1) +
+  geom_boxplot() +
+  scale_color_manual(values=c(Okabe_Ito[1], Okabe_Ito[2])) +
+  theme_classic() + theme(axis.text.x = element_text(size=8), 
+                          axis.title.x = element_text(face="bold"), 
+                          legend.position = "right") +
+  facet_wrap(vars(cell, genotype))
 
 ggsave("pictures/Kei_NOS_data.png", bg = "white")
 
@@ -188,7 +193,7 @@ filo_raw_tb_int
 filo_raw_tb_int %>%
   ggplot(aes(x = time, y = value, color = region)) +
   geom_line(aes(group = region)) +
-  theme_minimal()
+  theme_classic()
 
 ggsave("pictures/Tom_filo_data.png", bg = "white")
 
@@ -245,7 +250,7 @@ Figure1 <- panelA + panelB + panelC + panelD + panelE +
 
 #save figure as png (pdf also works)
 ggsave("figures/Figure1.png", limitsize = FALSE, 
-       units = c("px"), Figure1, width = 4000, height = 800, bg = "white")
+       units = c("px"), Figure1, width = 4000, height = 1500, bg = "white")
 
 
 #Change the layout of the panels
@@ -258,9 +263,9 @@ layout <-
    AADE"
 
 Figure1 <- panelA + panelB + panelC + panelD + panelE +
-  patchwork::plot_layout(design = layout, heights = c(1, 1)) +
-  patchwork::plot_annotation(tag_levels = "a") &
-  ggplot2::theme(plot.tag = element_text(size = 12, face='bold'))
+  patchwork::plot_layout(design = layout, heights = c(1,1)) +
+  patchwork::plot_annotation(tag_levels = "A") &
+  ggplot2::theme(plot.tag = element_text(size = 14, face='bold'))
 
 ggsave("figures/Figure1_layout2.png", limitsize = FALSE, 
-       units = c("px"), Figure1, width = 3200, height = 1600, bg = "white")
+       units = c("px"), Figure1, width = 4000, height = 1500, bg = "white")
